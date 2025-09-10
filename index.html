@@ -1,150 +1,83 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <title>California Resource Map</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <script src="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.js"></script>
-  <link href="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.css" rel="stylesheet" />
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
   <style>
-    html,body { height:100%; margin:0; }
-    #map { width:100%; height:100vh; min-height:600px; }
-    .mapboxgl-popup { max-width:320px; font:14px/1.4 "Helvetica Neue", Arial, sans-serif; }
-    /* debug box */
-    #debugBox { position: absolute; z-index:9999; top:12px; left:12px; background: rgba(255,255,255,0.95);
-      padding:8px 10px; border-radius:6px; font-family: Arial, sans-serif; font-size:12px; box-shadow:0 4px 12px rgba(0,0,0,0.12);}
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    .mapboxgl-popup {
+      max-width: 300px;
+      font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    }
   </style>
 </head>
 <body>
-  <div id="debugBox">Loading map…</div>
-  <div id="map" aria-label="California resources map"></div>
+
+<div id="map"></div>
 
 <script>
-(function(){
-  // === CONFIG - you already gave these, so they're baked in ===
-  const MAP_STYLE = 'https://api.mapbox.com/styles/v1/karinoelledesign/cmfbhvtvn004901so4yee4iua?access_token=pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
-  const ACCESS_TOKEN = 'pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
-  const TILESET_URL = 'mapbox://karinoelledesign.1kdo2o48';
-  const SOURCE_LAYER = 'california-locations-235efp'; // your source-layer
-  const debugEl = document.getElementById('debugBox');
+  // Your Mapbox token
+  mapboxgl.accessToken = 'pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
 
-  function dbg(txt){
-    debugEl.innerHTML = txt;
-    console.log(txt);
-  }
-
-  // load mapbox
-  mapboxgl.accessToken = ACCESS_TOKEN;
-
+  // Initialize map
   const map = new mapboxgl.Map({
     container: 'map',
-    // use your Studio style (with token appended) so hosted page can fetch it
-    style: MAP_STYLE,
-    center: [-119.4179, 36.7783],
+    style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
+    center: [-119.5, 37.25], // center of California
     zoom: 5
   });
 
-  map.addControl(new mapboxgl.NavigationControl());
-
-  map.on('error', (ev)=> {
-    dbg('Map error: ' + (ev && ev.error && ev.error.message ? ev.error.message : JSON.stringify(ev)));
-  });
-
   map.on('load', () => {
-    dbg('Style loaded. Looking for your points layer inside the style...');
-    try {
-      const style = map.getStyle();
-      // list sources & layers briefly
-      const sources = Object.keys(style.sources).map(k => ({key:k, type: style.sources[k].type, url: style.sources[k].url || ''}));
-      const layers = style.layers.map(l => ({ id:l.id, type:l.type, source:l.source||'', 'source-layer':l['source-layer']||'' }));
-
-      // try to find an existing layer that comes from your tileset or looks like locations
-      let candidate = style.layers.find(l => {
-        const id = (l.id||'').toLowerCase();
-        const src = (l.source||'').toLowerCase();
-        const sLayer = (l['source-layer']||'').toLowerCase();
-        if (src && src.includes('1kdo2o48')) return true;            // references tileset id
-        if (sLayer && sLayer.includes('california')) return true;  // source-layer match
-        if (id && /california|location|locations|point|pin|resource|site/i.test(id)) return true;
-        return false;
-      });
-
-      if (candidate) {
-        dbg(`Found layer <strong>${candidate.id}</strong> inside style — wiring popups to that layer.`);
-        attachPopups(candidate.id);
-        return;
-      }
-
-      // fallback: add the tileset as a new vector source and a circle layer using your provided source-layer
-      dbg('No existing candidate layer found in style. Adding tileset as a fallback source+layer.');
-      if (!map.getSource('california_locations_fallback')) {
-        map.addSource('california_locations_fallback', { type:'vector', url: TILESET_URL });
-      }
-
-      // Add fallback layer
-      if (!map.getLayer('california_points_fallback')) {
-        map.addLayer({
-          id: 'california_points_fallback',
-          type: 'circle',
-          source: 'california_locations_fallback',
-          'source-layer': SOURCE_LAYER,
-          paint: {
-            'circle-radius': 6,
-            'circle-color': ['match', ['get', 'Region'],
-              'North', 'hsl(193,82%,44%)',
-              'Central', 'hsl(41,90%,63%)',
-              'South', 'hsl(59,95%,72%)',
-              '#ff5722'
-            ],
-            'circle-stroke-color': '#fff',
-            'circle-stroke-width': 1
-          }
-        }, 'waterway-label'); // try to place it under labels if possible
-      }
-
-      attachPopups('california_points_fallback');
-      dbg('Fallback layer added and popups attached. If you do not see points, double-check tileset & source-layer names in Mapbox Studio.');
-
-    } catch (err) {
-      dbg('Error on load: ' + (err && err.message ? err.message : JSON.stringify(err)));
-    }
-  });
-
-  // add popup handlers for a layer id
-  function attachPopups(layerId) {
-    map.on('mouseenter', layerId, () => map.getCanvas().style.cursor = 'pointer');
-    map.on('mouseleave', layerId, () => map.getCanvas().style.cursor = '');
-    map.on('click', layerId, (e) => {
-      const f = (e.features && e.features[0]) || null;
-      if (!f) return;
-      const p = f.properties || {};
-      const name = p["Location Name"] || p["location name"] || p.name || 'Unnamed';
-      const address = p["Address"] || '';
-      const county = p["County"] || '';
-      const region = p["Region"] || '';
-      const rtype = p["Resource Type"] || '';
-      const services = p["Services Offered"] || '';
-      const contact = p["Contact Info"] || '';
-      const notes = p["Notes"] || '';
-      const website = p["Website"] || '';
-      const safe = s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
-
-      const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.3;max-width:320px">
-        <strong>${safe(name)}</strong><br/>
-        ${safe(address)}${address?'<br/>':''}
-        ${safe(county)}${county||region?', ':''}${safe(region)}<br/>
-        ${rtype?`<em>${safe(rtype)}</em><br/>` : ''}
-        ${services?`${safe(services)}<br/>` : ''}
-        ${contact?`${safe(contact)}<br/>` : ''}
-        ${notes?`${safe(notes)}<br/>` : ''}
-        ${website?`<a href="${safe(website)}" target="_blank">Website</a>` : ''}
-      </div>`;
-
-      new mapboxgl.Popup({ maxWidth:'320px' }).setLngLat(e.lngLat).setHTML(html).addTo(map);
+    // Add your tileset as a source
+    map.addSource('california_locations', {
+      type: 'vector',
+      url: 'mapbox://karinoelledesign.1kdo2o48' // tileset ID you provided
     });
-  }
 
-})();
+    // Add layer for points
+    map.addLayer({
+      id: 'california_points',
+      type: 'circle',
+      source: 'california_locations',
+      'source-layer': 'california-locations-235efp',
+      paint: {
+        'circle-radius': 6,
+        'circle-color': '#007cbf',
+        'circle-stroke-width': 1,
+        'circle-stroke-color': '#fff'
+      }
+    });
+
+    // Add popup on click
+    map.on('click', 'california_points', (e) => {
+      const props = e.features[0].properties;
+      const html = `
+        <strong>${props["Location Name"] || "No name"}</strong><br/>
+        County: ${props.County || "N/A"}<br/>
+        Region: ${props.Region || "N/A"}<br/>
+        Resource: ${props["Resource Type"] || "N/A"}<br/>
+        Services: ${props["Services Offered"] || "N/A"}<br/>
+        <a href="${props.Website || '#'}" target="_blank">Website</a><br/>
+        Notes: ${props.Notes || "N/A"}
+      `;
+      new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(html)
+        .addTo(map);
+    });
+
+    // Change cursor on hover
+    map.on('mouseenter', 'california_points', () => {
+      map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'california_points', () => {
+      map.getCanvas().style.cursor = '';
+    });
+  });
 </script>
 
 </body>
