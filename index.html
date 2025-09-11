@@ -23,64 +23,50 @@
     // ✅ Your public access token
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
 
-    // ✅ Initialize map
-    const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
-      center: [-119.4179, 36.7783], // California
-      zoom: 5
-    });
+// ✅ Initialize map
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
+  center: [-119.4179, 36.7783], // California
+  zoom: 5
+});
 
-    // ✅ Add navigation controls (zoom in/out + compass)
-    map.addControl(new mapboxgl.NavigationControl());
+// ✅ Add navigation controls (zoom in/out + compass)
+map.addControl(new mapboxgl.NavigationControl());
 
-    map.on('load', () => {
-      // Add your vector tileset as a source
-      map.addSource('california_locations', {
-        type: 'vector',
-        url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
-      });
+map.on('load', () => {
+  // IMPORTANT: No need to add the source or layer again!
+  // The style 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua'
+  // already includes the source and the styled layer.
 
-      // Add a circle layer for the points
-      map.addLayer({
-        id: 'california_points',
-        type: 'circle',
-        source: 'california_locations',
-        'source-layer': 'california_locations-235efp', // Source layer name
-        paint: {
-          'circle-radius': 6,
-          'circle-color': '#007cbf',
-          'circle-stroke-width': 1,
-          'circle-stroke-color': '#fff'
-        }
-      });
+  // ✅ Add popups when clicking points
+  // Use the correct layer ID from Mapbox Studio here
+  map.on('click', '<YOUR_STUDIO_LAYER_ID>', (e) => {
+    const props = e.features[0].properties;
 
-      // ✅ Add popups when clicking points
-      map.on('click', 'california_points', (e) => {
-        const props = e.features[0].properties;
+    const popupContent = `
+      <strong>${props["Location Name"] || "No Name"}</strong><br>
+      County: ${props.County || "N/A"}<br>
+      Region: ${props.Region || "N/A"}<br>
+      Services: ${props["Services Offered"] || "N/A"}<br>
+      <a href="${props.Website || "#"}" target="_blank">Website</a>
+    `;
 
-        const popupContent = `
-          <strong>${props["Location Name"] || "No Name"}</strong><br>
-          County: ${props.County || "N/A"}<br>
-          Region: ${props.Region || "N/A"}<br>
-          Services: ${props["Services Offered"] || "N/A"}<br>
-          <a href="${props.Website || "#"}" target="_blank">Website</a>
-        `;
+    new mapboxgl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(popupContent)
+      .addTo(map);
+  });
 
-        new mapboxgl.Popup()
-          .setLngLat(e.lngLat)
-          .setHTML(popupContent)
-          .addTo(map);
-      });
-
-      // ✅ Change cursor to pointer when hovering points
-      map.on('mouseenter', 'california_points', () => {
-        map.getCanvas().style.cursor = 'pointer';
-      });
-      map.on('mouseleave', 'california_points', () => {
-        map.getCanvas().style.cursor = '';
-      });
-    });
+  // ✅ Change cursor to pointer when hovering points
+  // Use the correct layer ID from Mapbox Studio here
+  map.on('mouseenter', '<YOUR_STUDIO_LAYER_ID>', () => {
+    map.getCanvas().style.cursor = 'pointer';
+  });
+  map.on('mouseleave', '<YOUR_STUDIO_LAYER_ID>', () => {
+    map.getCanvas().style.cursor = '';
+  });
+});
   </script>
 </body>
 </html>
