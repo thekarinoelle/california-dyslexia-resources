@@ -1,36 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <title>California Dyslexia Resources</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.css" rel="stylesheet" />
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-    }
-    #map {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 100%;
-    }
-    .mapboxgl-popup {
-      max-width: 300px;
-      font: 14px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
-    }
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    .mapboxgl-popup { max-width: 300px; font: 14px/20px 'Helvetica Neue', Arial, sans-serif; }
   </style>
 </head>
 <body>
-  <div id="map">Loading map…</div>
+  <div id="map"></div>
 
   <script>
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
 
     const map = new mapboxgl.Map({
       container: 'map',
-      style:
+      style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
+      center: [-119.4179, 36.7783], // California center
+      zoom: 5
+    });
+
+    map.on('load', () => {
+      // Add your tileset as a source
+      map.addSource('california_locations', {
+        type: 'vector',
+        url: 'mapbox://karinoelledesign.1kdo2o48'
+      });
+
+      // Add layer for points
+      map.addLayer({
+        id: 'california_points',
+        type: 'circle',
+        source: 'california_locations',
+        'source-layer': 'california_locations-235efp',
+        paint: {
+          'circle-radius': 6,
+          'circle-color': '#ff5733',
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#fff'
+        }
+      });
+
+      // Add popup on click
+      map.on('click', 'california_points', (e) => {
+        const props = e.features[0].properties;
+        const html = `
+          <strong>${props["Location Name"] || "No name"}</strong><br/>
+          County: ${props.County || "N/A"}<br/>
+          Region: ${props.Region || "N/A"}<br/>
+          Services: ${props["Services Offered"] || "N/A"}
+        `;
+        new mapboxgl.Popup()
+          .setLngLat(e.lngLat)
+          .setHTML(html)
+          .addTo(map);
+      });
+
+      // Change cursor on hover
+      map.on('mouseenter', 'california_points', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', 'california_points', () => {
+        map.getCanvas().style.cursor = '';
+      });
+    });
+  </script>
+</body>
+</html>
