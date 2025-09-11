@@ -5,9 +5,13 @@
   <title>California Dyslexia Resources</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Corrected Mapbox CSS & JS -->
+  <!-- Corrected Mapbox GL JS and CSS -->
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css" rel="stylesheet">
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
+
+  <!-- Mapbox Geocoder Plugin CSS and JS -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
 
   <style>
     body { margin: 0; padding: 0; }
@@ -31,6 +35,13 @@
       zoom: 5
     });
 
+    // ✅ Add search control (geocoder)
+    const geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl
+    });
+    map.addControl(geocoder);
+
     // ✅ Add navigation controls (zoom in/out + compass)
     map.addControl(new mapboxgl.NavigationControl());
 
@@ -50,11 +61,12 @@
       map.on('click', studioLayerId, (e) => {
         const props = e.features[0].properties;
 
+        // Bolding field titles in the popup
         const popupContent = `
-          <strong>${props["Location Name"] || "No Name"}</strong><br>
-          County: ${props.County || "N/A"}<br>
-          Region: ${props.Region || "N/A"}<br>
-          Services: ${props["Services Offered"] || "N/A"}<br>
+          <strong>Location Name:</strong> ${props["Location Name"] || "No Name"}<br>
+          <strong>County:</strong> ${props.County || "N/A"}<br>
+          <strong>Region:</strong> ${props.Region || "N/A"}<br>
+          <strong>Services:</strong> ${props["Services Offered"] || "N/A"}<br>
           <a href="${props.Website || "#"}" target="_blank">Website</a>
         `;
 
