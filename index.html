@@ -1,71 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8">
   <title>California Dyslexia Resources</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Mapbox GL JS CSS -->
+  <!-- Mapbox CSS & JS -->
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.css" rel="stylesheet">
-
-  <!-- Mapbox GL JS Script -->
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.js"></script>
 
   <style>
     body { margin: 0; padding: 0; }
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-    .mapboxgl-popup {
-      max-width: 300px;
-      font: 14px/20px 'Helvetica Neue', Arial, sans-serif;
-    }
+    .mapboxgl-popup { max-width: 300px; font: 14px/20px 'Helvetica Neue', Arial, sans-serif; }
   </style>
 </head>
 <body>
   <div id="map"></div>
 
+  <!-- Custom Map Script -->
   <script>
-    // ✅ Your Mapbox access token
+    // ✅ Your public access token
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
 
     // ✅ Initialize map
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
-      center: [-119.4179, 36.7783], // California center
+      center: [-119.4179, 36.7783], // California
       zoom: 5
     });
 
+    // ✅ Add navigation controls (zoom in/out + compass)
+    map.addControl(new mapboxgl.NavigationControl());
+
     map.on('load', () => {
-      // Add your vector source
+      // Add your vector tileset as a source
       map.addSource('california_locations', {
         type: 'vector',
-        url: 'mapbox://karinoelledesign.1kdo2o48'
+        url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
       });
 
-      // Add a layer to display points
+      // Add a circle layer for the points
       map.addLayer({
         id: 'california_points',
         type: 'circle',
         source: 'california_locations',
-        'source-layer': 'california_locations-235efp',
+        'source-layer': 'california_locations-235efp', // Source layer name
         paint: {
           'circle-radius': 6,
-          'circle-color': '#ff0000'
+          'circle-color': '#007cbf',
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#fff'
         }
       });
 
-      // Add popup interaction
+      // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
         const props = e.features[0].properties;
 
         const popupContent = `
-          <strong>${props['Location Name'] || 'No name'}</strong><br>
-          <em>${props['County'] || ''}</em><br>
-          ${props['Address'] || ''}<br>
-          ${props['Contact Info'] || ''}<br>
-          ${props['Notes'] || ''}<br>
-          ${props['Services Offered'] || ''}<br>
-          ${props['Website'] ? `<a href="${props['Website']}" target="_blank">Website</a>` : ''}
+          <strong>${props["Location Name"] || "No Name"}</strong><br>
+          County: ${props.County || "N/A"}<br>
+          Region: ${props.Region || "N/A"}<br>
+          Services: ${props["Services Offered"] || "N/A"}<br>
+          <a href="${props.Website || "#"}" target="_blank">Website</a>
         `;
 
         new mapboxgl.Popup()
@@ -74,7 +73,7 @@
           .addTo(map);
       });
 
-      // Change cursor on hover
+      // ✅ Change cursor to pointer when hovering points
       map.on('mouseenter', 'california_points', () => {
         map.getCanvas().style.cursor = 'pointer';
       });
