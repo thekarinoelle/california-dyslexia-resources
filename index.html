@@ -5,7 +5,7 @@
   <title>California Dyslexia Resources</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Mapbox CSS & JS -->
+  <!-- Corrected Mapbox CSS & JS -->
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css" rel="stylesheet">
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
 
@@ -23,50 +23,55 @@
     // ✅ Your public access token
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
 
-// ✅ Initialize map
-const map = new mapboxgl.Map({
-  container: 'map',
-  style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
-  center: [-119.4179, 36.7783], // California
-  zoom: 5
-});
+    // ✅ Initialize map
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
+      center: [-119.4179, 36.7783], // California
+      zoom: 5
+    });
 
-// ✅ Add navigation controls (zoom in/out + compass)
-map.addControl(new mapboxgl.NavigationControl());
+    // ✅ Add navigation controls (zoom in/out + compass)
+    map.addControl(new mapboxgl.NavigationControl());
 
-map.on('load', () => {
-  // IMPORTANT: No need to add the source or layer again!
-  // The style 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua'
-  // already includes the source and the styled layer.
+    map.on('load', () => {
+      // **IMPORTANT:** Since the custom style you created already contains
+      // your vector tile source and layer, you do NOT need to add them again.
+      // This was the cause of the style override.
 
-  // ✅ Add popups when clicking points
-  // Use the correct layer ID from Mapbox Studio here
-  map.on('click', '<YOUR_STUDIO_LAYER_ID>', (e) => {
-    const props = e.features[0].properties;
+      // **NOTE:** You still need to find and use the exact layer ID from your
+      // custom style for the popup and cursor events to work.
+      // 1. Log in to your Mapbox account.
+      // 2. Go to your style: https://studio.mapbox.com/styles/karinoelledesign/cmfbhvtvn004901so4yee4iua
+      // 3. Click the "Layers" panel and find the ID of your data layer.
+      const studioLayerId = '<YOUR_STUDIO_LAYER_ID>';
 
-    const popupContent = `
-      <strong>${props["Location Name"] || "No Name"}</strong><br>
-      County: ${props.County || "N/A"}<br>
-      Region: ${props.Region || "N/A"}<br>
-      Services: ${props["Services Offered"] || "N/A"}<br>
-      <a href="${props.Website || "#"}" target="_blank">Website</a>
-    `;
+      // ✅ Add popups when clicking points
+      map.on('click', studioLayerId, (e) => {
+        const props = e.features[0].properties;
 
-    new mapboxgl.Popup()
-      .setLngLat(e.lngLat)
-      .setHTML(popupContent)
-      .addTo(map);
-  });
+        const popupContent = `
+          <strong>${props["Location Name"] || "No Name"}</strong><br>
+          County: ${props.County || "N/A"}<br>
+          Region: ${props.Region || "N/A"}<br>
+          Services: ${props["Services Offered"] || "N/A"}<br>
+          <a href="${props.Website || "#"}" target="_blank">Website</a>
+        `;
 
-  // ✅ Change cursor to pointer when hovering points
-  // Use the correct layer ID from Mapbox Studio here
-  map.on('mouseenter', '<YOUR_STUDIO_LAYER_ID>', () => {
-    map.getCanvas().style.cursor = 'pointer';
-  });
-  map.on('mouseleave', '<YOUR_STUDIO_LAYER_ID>', () => {
-    map.getCanvas().style.cursor = '';
-  });
-});
+        new mapboxgl.Popup()
+          .setLngLat(e.lngLat)
+          .setHTML(popupContent)
+          .addTo(map);
+      });
+
+      // ✅ Change cursor to pointer when hovering points
+      map.on('mouseenter', studioLayerId, () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', studioLayerId, () => {
+        map.getCanvas().style.cursor = '';
+      });
+    });
   </script>
 </body>
 </html>
