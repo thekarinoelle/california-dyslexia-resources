@@ -46,9 +46,26 @@
     map.addControl(new mapboxgl.NavigationControl());
 
     map.on('load', () => {
-      // **Use the updated layer ID for events**
-      const studioLayerId = 'california-dyslexia-resource-locations';
+      // **RE-ADDED: Add your vector tileset as a source**
+      map.addSource('california_locations', {
+        type: 'vector',
+        url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
+      });
 
+      // **RE-ADDED: Add a circle layer for the points**
+      map.addLayer({
+        id: 'california_points',
+        type: 'circle',
+        source: 'california_locations',
+        'source-layer': 'california_locations-235efp', // Source layer name
+        paint: {
+          'circle-radius': 6,
+          'circle-color': '#007cbf',
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#fff'
+        }
+      });
+      
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
         const props = e.features[0].properties;
@@ -86,10 +103,11 @@
       });
       
       // ✅ Change cursor to pointer when hovering points
-      map.on('mouseenter', studioLayerId, () => {
+      // The layer ID was corrected to 'california_points'
+      map.on('mouseenter', 'california_points', () => {
         map.getCanvas().style.cursor = 'pointer';
       });
-      map.on('mouseleave', studioLayerId, () => {
+      map.on('mouseleave', 'california_points', () => {
         map.getCanvas().style.cursor = '';
       });
     });
