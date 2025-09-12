@@ -71,17 +71,11 @@
         type: 'vector',
         url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
       });
-
-      // ✅ ADDED: A check to ensure the layer exists in the style before adding event listeners.
-      // This is necessary since we removed the `map.addLayer` call.
-      // The name 'california_locations-235efp' comes from your Mapbox Studio style.
-      if (!map.getLayer('california_locations-235efp')) {
-        console.error("Layer 'california_locations-235efp' not found in style. Check your Mapbox Studio style settings.");
-        return;
-      }
       
       // ✅ Add popups when clicking points, listening to the layer in your Studio style.
+      // The layer ID 'california_locations-235efp' comes from your Mapbox Studio style.
       map.on('click', 'california_locations-235efp', (e) => {
+        // ✅ FIX: Access the properties of the first clicked feature correctly.
         const props = e.features[0].properties;
         let popupContent = '';
 
@@ -130,7 +124,7 @@
             if (popupContentElement) {
               popupContentElement.scrollTop = 0;
             }
-          }, 150); // Increased delay slightly more for greater reliability
+          }, 150);
         });
       });
       
