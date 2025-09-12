@@ -5,7 +5,7 @@
   <title>California Dyslexia Resources</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Corrected Mapbox GL JS and CSS -->
+  <!-- Mapbox GL JS and CSS -->
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css" rel="stylesheet">
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
 
@@ -27,10 +27,10 @@
     // ✅ Your public access token
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
 
-    // ✅ Initialize map
+    // ✅ Initialize map with your custom style URL
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
+      style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua', // Use your custom monochrome style
       center: [-119.4179, 36.7783], // California
       zoom: 5
     });
@@ -46,19 +46,12 @@
     map.addControl(new mapboxgl.NavigationControl());
 
     map.on('load', () => {
-      // **IMPORTANT:** Since the custom style you created already contains
-      // your vector tile source and layer, you do NOT need to add them again.
-      // This was the cause of the style override.
-
-      // **NOTE:** You still need to find and use the exact layer ID from your
-      // custom style for the popup and cursor events to work.
-      // 1. Log in to your Mapbox account.
-      // 2. Go to your style: https://studio.mapbox.com/styles/karinoelledesign/cmfbhvtvn004901so4yee4iua
-      // 3. Click the "Layers" panel and find the ID of your data layer.
-      const studioLayerId = 'california-locations-235efp';
+      // **Use the updated layer ID for events**
+      const studioLayerId = 'california-dyslexia-resource-locations';
 
       // ✅ Add popups when clicking points
       map.on('click', studioLayerId, (e) => {
+        // Corrected feature property access
         const props = e.features[0].properties;
 
         // Bolding field titles in the popup
