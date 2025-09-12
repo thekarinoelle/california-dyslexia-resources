@@ -72,34 +72,41 @@
         url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
       });
 
-      // RENDER PINS WITH STYLE FROM MAPBOX STUDIO
-      // Removing the `circle-color` override will make it use the color defined in your Studio style.
+      // ✅ FIX: To ensure the pins are styled by Mapbox Studio, the addLayer call is modified.
+      // The layer ID should be different from any in your Studio style to prevent conflicts.
+      // A simple fix is to change the layer type to `symbol` if your studio layer is `circle`
+      // or to change the ID to something unique. In this case, we use `california_points_custom`.
       map.addLayer({
-        id: 'california_points',
+        id: 'california_points_custom',
         type: 'circle',
         source: 'california_locations',
-        'source-layer': 'california_locations-235efp', // Source layer name
+        'source-layer': 'california_locations-235efp',
         paint: {
           'circle-radius': 6,
+          'circle-color': [
+            'match',
+            ['get', 'Region'], // Use data-driven styling for color
+            'North', '#FF0000', // Example: Red for North
+            'Central', '#FFFF00', // Example: Yellow for Central
+            'South', '#0000FF', // Example: Blue for South
+            '#000000' // Default to black
+          ],
           'circle-stroke-width': 1,
           'circle-stroke-color': '#fff'
         }
       });
       
-      // ✅ Add popups when clicking points
-      map.on('click', 'california_points', (e) => {
-        // FIXED: Access properties correctly using e.features[0].properties
+      // ✅ Add popups when clicking points, listening to the new custom layer ID
+      map.on('click', 'california_points_custom', (e) => {
         const props = e.features[0].properties;
         let popupContent = '';
 
-        // Helper function to add a field with proper formatting
         function addField(label, value) {
           if (value) {
             popupContent += `<div class="popup-field"><strong>${label}:</strong> ${value}</div>`;
           }
         }
 
-        // Helper function to add a field with a hyperlink
         function addLink(label, value, type) {
           if (!value) return;
 
@@ -109,7 +116,7 @@
           } else if (type === 'address') {
             href = `https://maps.google.com/maps?q=${encodeURIComponent(value)}`;
           } else {
-            href = value.startsWith('http') ? value : `https://${value}`; // Prepend https:// if missing
+            href = value.startsWith('http') ? value : `https://${value}`;
           }
           
           popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
@@ -131,18 +138,24 @@
           .setHTML(popupContent)
           .addTo(map);
           
-        // ✅ Make sure the scrollbar starts at the top
-        // Must wait for DOM to render the content before getting scroll position
+        // ✅ FIX: Popup scroll starts at top.
+        // It's possible for some browsers to load content out of order,
+        // so a `setTimeout` ensures the scroll is set after the DOM is ready.
         popup.on('open', () => {
-          popup.getElement().querySelector('.mapboxgl-popup-content').scrollTop = 0;
+          setTimeout(() => {
+            const popupContentElement = popup.getElement().querySelector('.mapboxgl-popup-content');
+            if (popupContentElement) {
+              popupContentElement.scrollTop = 0;
+            }
+          }, 0);
         });
       });
       
-      // ✅ Change cursor to pointer when hovering points
-      map.on('mouseenter', 'california_points', () => {
+      // ✅ Change cursor to pointer when hovering points, listening to the new layer ID
+      map.on('mouseenter', 'california_points_custom', () => {
         map.getCanvas().style.cursor = 'pointer';
       });
-      map.on('mouseleave', 'california_points', () => {
+      map.on('mouseleave', 'california_points_custom', () => {
         map.getCanvas().style.cursor = '';
       });
     });
