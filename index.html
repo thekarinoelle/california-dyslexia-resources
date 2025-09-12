@@ -19,7 +19,6 @@
     .mapboxgl-popup { max-width: 300px; font: 14px/20px 'Helvetica Neue', Arial, sans-serif; }
 
     /* ✅ Add custom styling for the popup content */
-    /* Make popup content scrollable and add padding */
     .mapboxgl-popup-content {
       padding: 15px; /* Add internal padding */
       max-height: 250px; /* Set max height to enable scrolling */
@@ -36,8 +35,8 @@
     /* Remove the border for the last field */
     .popup-field:last-of-type {
       border-bottom: none;
+      padding-bottom: 0;
     }
-    
   </style>
 </head>
 <body>
@@ -67,13 +66,13 @@
     map.addControl(new mapboxgl.NavigationControl());
 
     map.on('load', () => {
-      // **RE-ADDED: Add your vector tileset as a source**
+      // Add your vector tileset as a source
       map.addSource('california_locations', {
         type: 'vector',
         url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
       });
 
-      // ✅ Use a data-driven expression to color points by region
+      // ✅ RENDER PINS WITH STYLE FROM MAPBOX STUDIO (Removed the `circle-color` override)
       map.addLayer({
         id: 'california_points',
         type: 'circle',
@@ -81,14 +80,6 @@
         'source-layer': 'california_locations-235efp', // Source layer name
         paint: {
           'circle-radius': 6,
-          'circle-color': [
-            'match',
-            ['get', 'Region'], // Get the 'Region' property from your data
-            'North', '#FF0000', // Red for North
-            'Central', '#FFFF00', // Yellow for Central
-            'South', '#0000FF', // Blue for South
-            '#007cbf' // Default color if no match
-          ],
           'circle-stroke-width': 1,
           'circle-stroke-color': '#fff'
         }
@@ -96,35 +87,50 @@
       
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
-        const props = e.features[0].properties;
+        const props = e.features.properties;
         let popupContent = '';
 
-        // Add optional fields only if they exist, and format them
+        // Helper function to add a field with proper formatting
         function addField(label, value) {
           if (value) {
             popupContent += `<div class="popup-field"><strong>${label}:</strong> ${value}</div>`;
           }
         }
 
-        // Add fields using the new helper function
+        // Helper function to add a field with a hyperlink
+        function addLink(label, value, type) {
+          if (!value) return;
+
+          let href;
+          if (type === 'email') {
+            href = `mailto:${value}`;
+          } else if (type === 'address') {
+            href = `https://maps.google.com/maps?q=${encodeURIComponent(value)}`;
+          } else {
+            href = value; // Default to a standard URL
+          }
+          
+          popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
+        }
+
+        // Add fields to the popup content
         addField("Location Name", props["Location Name"]);
         addField("County", props.County);
         addField("Region", props.Region);
         addField("Resource Type", props["Resource Type"]);
         addField("Services Offered", props["Services Offered"]);
-        addField("Address", props.Address);
-        addField("Contact Info", props["Contact Info"]);
+        addLink("Address", props.Address, "address");
+        addLink("Contact Info", props["Contact Info"], "email");
         addField("Notes", props.Notes);
+        addLink("Website", props.Website, "url");
 
-        // Handle the website link separately
-        if (props.Website) {
-          popupContent += `<div class="popup-field"><a href="${props.Website}" target="_blank">Website</a></div>`;
-        }
-        
-        new mapboxgl.Popup()
+        const popup = new mapboxgl.Popup()
           .setLngLat(e.lngLat)
           .setHTML(popupContent)
           .addTo(map);
+          
+        // ✅ Make sure the scrollbar starts at the top
+        popup.getElement().querySelector('.mapboxgl-popup-content').scrollTop = 0;
       });
       
       // ✅ Change cursor to pointer when hovering points
