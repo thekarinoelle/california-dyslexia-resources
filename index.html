@@ -50,25 +50,41 @@
       const studioLayerId = 'california-dyslexia-resource-locations';
 
       // ✅ Add popups when clicking points
-      map.on('click', studioLayerId, (e) => {
-        // Corrected feature property access
+      map.on('click', 'california_points', (e) => {
         const props = e.features[0].properties;
+        let popupContent = '';
 
-        // Bolding field titles in the popup
-        const popupContent = `
-          <strong>Location Name:</strong> ${props["Location Name"] || "No Name"}<br>
-          <strong>County:</strong> ${props.County || "N/A"}<br>
-          <strong>Region:</strong> ${props.Region || "N/A"}<br>
-          <strong>Services:</strong> ${props["Services Offered"] || "N/A"}<br>
-          <a href="${props.Website || "#"}" target="_blank">Website</a>
-        `;
+        // Start with the required fields
+        popupContent += `<strong>${props["Location Name"] || "No Name"}</strong><br>`;
+        popupContent += `County: ${props.County || "N/A"}<br>`;
+        popupContent += `Region: ${props.Region || "N/A"}<br>`;
+
+        // Add optional fields only if they exist
+        if (props["Resource Type"]) {
+          popupContent += `Resource Type: ${props["Resource Type"]}<br>`;
+        }
+        if (props["Services Offered"]) {
+          popupContent += `Services: ${props["Services Offered"]}<br>`;
+        }
+        if (props.Address) {
+          popupContent += `Address: ${props.Address}<br>`;
+        }
+        if (props["Contact Info"]) {
+          popupContent += `Contact Info: ${props["Contact Info"]}<br>`;
+        }
+        if (props.Notes) {
+          popupContent += `Notes: ${props.Notes}<br>`;
+        }
+        if (props.Website) {
+          popupContent += `<a href="${props.Website}" target="_blank">Website</a><br>`;
+        }
 
         new mapboxgl.Popup()
           .setLngLat(e.lngLat)
           .setHTML(popupContent)
           .addTo(map);
       });
-
+      
       // ✅ Change cursor to pointer when hovering points
       map.on('mouseenter', studioLayerId, () => {
         map.getCanvas().style.cursor = 'pointer';
