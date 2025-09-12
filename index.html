@@ -30,48 +30,10 @@
     // ✅ Initialize map with your custom style URL
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
-      center: [-119.4179, 36.7783],
+      style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua', // Use your custom monochrome style
+      center: [-119.4179, 36.7783], // California
       zoom: 5
     });
-
-    // GeoJSON data for California regions (for illustration)
-    // Replace with more accurate coordinates if needed
-    const regions = {
-      'type': 'FeatureCollection',
-      'features': [
-        {
-          'type': 'Feature',
-          'geometry': {
-            'type': 'Polygon',
-            'coordinates': [[
-              [-124.4, 42.0], [-120.0, 42.0], [-120.0, 38.0], [-124.4, 38.0], [-124.4, 42.0]
-            ]]
-          },
-          'properties': { 'region': 'North', 'center': [-122.2, 40.0] }
-        },
-        {
-          'type': 'Feature',
-          'geometry': {
-            'type': 'Polygon',
-            'coordinates': [[
-              [-124.0, 38.0], [-117.0, 38.0], [-117.0, 35.0], [-124.0, 35.0], [-124.0, 38.0]
-            ]]
-          },
-          'properties': { 'region': 'Central', 'center': [-120.5, 36.5] }
-        },
-        {
-          'type': 'Feature',
-          'geometry': {
-            'type': 'Polygon',
-            'coordinates': [[
-              [-122.0, 35.0], [-114.0, 35.0], [-114.0, 32.5], [-122.0, 32.5], [-122.0, 35.0]
-            ]]
-          },
-          'properties': { 'region': 'South', 'center': [-118.0, 33.75] }
-        }
-      ]
-    };
 
     // ✅ Add search control (geocoder)
     const geocoder = new MapboxGeocoder({
@@ -87,72 +49,12 @@
       // **Use the updated layer ID for events**
       const studioLayerId = 'california-dyslexia-resource-locations';
 
-      // --- Add regions GeoJSON source and layers ---
-      map.addSource('regions', {
-        'type': 'geojson',
-        'data': regions
-      });
-
-      // Add a transparent fill layer for regions to make them clickable
-      map.addLayer({
-        'id': 'regions-fill',
-        'type': 'fill',
-        'source': 'regions',
-        'paint': {
-          'fill-color': '#0080ff',
-          'fill-opacity': 0.1
-        }
-      });
-
-      // Add an outline for regions
-      map.addLayer({
-        'id': 'regions-outline',
-        'type': 'line',
-        'source': 'regions',
-        'paint': {
-          'line-color': '#0080ff',
-          'line-width': 2
-        }
-      });
-      
-      // Add a symbol layer for region labels
-      map.addLayer({
-        'id': 'regions-label',
-        'type': 'symbol',
-        'source': 'regions',
-        'layout': {
-          'text-field': ['get', 'region'],
-          'text-size': 16,
-          'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-          'text-anchor': 'center'
-        },
-        'paint': {
-          'text-color': '#0080ff'
-        }
-      });
-
-      // --- Add region click functionality ---
-      map.on('click', 'regions-fill', (e) => {
-        const clickedRegion = e.features[0];
-        const bounds = new mapboxgl.LngLatBounds(clickedRegion.geometry.coordinates[0]);
-        map.fitBounds(bounds, {
-          padding: 50,
-          duration: 1000
-        });
-      });
-
-      // Change cursor to pointer over regions
-      map.on('mouseenter', 'regions-fill', () => {
-        map.getCanvas().style.cursor = 'pointer';
-      });
-      map.on('mouseleave', 'regions-fill', () => {
-        map.getCanvas().style.cursor = '';
-      });
-
-      // --- Existing pinpoints and popup logic ---
+      // ✅ Add popups when clicking points
       map.on('click', studioLayerId, (e) => {
+        // Corrected feature property access
         const props = e.features[0].properties;
 
+        // Bolding field titles in the popup
         const popupContent = `
           <strong>Location Name:</strong> ${props["Location Name"] || "No Name"}<br>
           <strong>County:</strong> ${props.County || "N/A"}<br>
@@ -167,6 +69,7 @@
           .addTo(map);
       });
 
+      // ✅ Change cursor to pointer when hovering points
       map.on('mouseenter', studioLayerId, () => {
         map.getCanvas().style.cursor = 'pointer';
       });
