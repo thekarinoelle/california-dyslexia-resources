@@ -76,6 +76,10 @@
       // The layer ID 'california_locations-235efp' comes from your Mapbox Studio style.
       map.on('click', 'california_locations-235efp', (e) => {
         // ✅ FIX: Access the properties of the first clicked feature correctly.
+        // It should be e.features[0].properties
+        if (e.features.length === 0) {
+            return;
+        }
         const props = e.features[0].properties;
         let popupContent = '';
 
