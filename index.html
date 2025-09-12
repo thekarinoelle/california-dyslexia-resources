@@ -66,13 +66,22 @@
     map.addControl(new mapboxgl.NavigationControl());
 
     map.on('load', () => {
-      // ✅ No need to add the source or layer here. The custom style `cmfbhvtvn004901so4yee4iua`
-      // already contains your data layer and colors, so there is no conflict.
+      // ✅ RESTORED: Add your vector tileset as a source so the data is available to JavaScript
+      map.addSource('california_locations', {
+        type: 'vector',
+        url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
+      });
 
+      // ✅ ADDED: A check to ensure the layer exists in the style before adding event listeners.
+      // This is necessary since we removed the `map.addLayer` call.
+      // The name 'california_locations-235efp' comes from your Mapbox Studio style.
+      if (!map.getLayer('california_locations-235efp')) {
+        console.error("Layer 'california_locations-235efp' not found in style. Check your Mapbox Studio style settings.");
+        return;
+      }
+      
       // ✅ Add popups when clicking points, listening to the layer in your Studio style.
-      // The name might vary; here we use the name from your original code.
       map.on('click', 'california_locations-235efp', (e) => {
-        // Access properties correctly using e.features[0].properties
         const props = e.features[0].properties;
         let popupContent = '';
 
@@ -86,7 +95,7 @@
           if (!value) return;
 
           let href;
-          if (type === 'email' && value.includes('@')) { // ✅ Check for '@' to ensure valid email
+          if (type === 'email' && value.includes('@')) {
             href = `mailto:${value}`;
             popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
           } else if (type === 'address') {
@@ -96,12 +105,10 @@
             href = value.startsWith('http') ? value : `https://${value}`;
             popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
           } else {
-            // For non-hyperlinkable emails or other text, just add as a normal field
             addField(label, value);
           }
         }
 
-        // Add fields to the popup content
         addField("Location Name", props["Location Name"]);
         addField("County", props.County);
         addField("Region", props.Region);
@@ -117,15 +124,13 @@
           .setHTML(popupContent)
           .addTo(map);
           
-        // ✅ Make sure the scrollbar starts at the top
-        // Delay setting the scroll position slightly to avoid race conditions.
         popup.on('open', () => {
           setTimeout(() => {
             const popupContentElement = popup.getElement().querySelector('.mapboxgl-popup-content');
             if (popupContentElement) {
               popupContentElement.scrollTop = 0;
             }
-          }, 100); // Increased delay slightly for greater reliability
+          }, 150); // Increased delay slightly more for greater reliability
         });
       });
       
