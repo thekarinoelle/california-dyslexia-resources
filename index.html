@@ -66,47 +66,56 @@
     map.addControl(new mapboxgl.NavigationControl());
 
     map.on('load', () => {
-      // ✅ RESTORED: Add your vector tileset as a source so the data is available to JavaScript
+      // Add your vector tileset as a source
       map.addSource('california_locations', {
         type: 'vector',
         url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
       });
-      
-      // ✅ Add popups when clicking points, listening to the layer in your Studio style.
-      // The layer ID 'california_locations-235efp' comes from your Mapbox Studio style.
-      map.on('click', 'california_locations-235efp', (e) => {
-        // ✅ FIX: Access the properties of the first clicked feature correctly.
-        // It should be e.features[0].properties
-        if (e.features.length === 0) {
-            return;
+
+      // RENDER PINS WITH STYLE FROM MAPBOX STUDIO
+      // Removing the `circle-color` override will make it use the color defined in your Studio style.
+      map.addLayer({
+        id: 'california_points',
+        type: 'circle',
+        source: 'california_locations',
+        'source-layer': 'california_locations-235efp', // Source layer name
+        paint: {
+          'circle-radius': 6,
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#fff'
         }
+      });
+      
+      // ✅ Add popups when clicking points
+      map.on('click', 'california_points', (e) => {
+        // FIXED: Access properties correctly using e.features[0].properties
         const props = e.features[0].properties;
         let popupContent = '';
 
+        // Helper function to add a field with proper formatting
         function addField(label, value) {
           if (value) {
             popupContent += `<div class="popup-field"><strong>${label}:</strong> ${value}</div>`;
           }
         }
 
+        // Helper function to add a field with a hyperlink
         function addLink(label, value, type) {
           if (!value) return;
 
           let href;
-          if (type === 'email' && value.includes('@')) {
+          if (type === 'email') {
             href = `mailto:${value}`;
-            popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
           } else if (type === 'address') {
             href = `https://maps.google.com/maps?q=${encodeURIComponent(value)}`;
-            popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
-          } else if (type === 'url') {
-            href = value.startsWith('http') ? value : `https://${value}`;
-            popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
           } else {
-            addField(label, value);
+            href = value.startsWith('http') ? value : `https://${value}`; // Prepend https:// if missing
           }
+          
+          popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
         }
 
+        // Add fields to the popup content
         addField("Location Name", props["Location Name"]);
         addField("County", props.County);
         addField("Region", props.Region);
@@ -122,21 +131,18 @@
           .setHTML(popupContent)
           .addTo(map);
           
+        // ✅ Make sure the scrollbar starts at the top
+        // Must wait for DOM to render the content before getting scroll position
         popup.on('open', () => {
-          setTimeout(() => {
-            const popupContentElement = popup.getElement().querySelector('.mapboxgl-popup-content');
-            if (popupContentElement) {
-              popupContentElement.scrollTop = 0;
-            }
-          }, 150);
+          popup.getElement().querySelector('.mapboxgl-popup-content').scrollTop = 0;
         });
       });
       
-      // ✅ Change cursor to pointer when hovering points, listening to the custom style layer.
-      map.on('mouseenter', 'california_locations-235efp', () => {
+      // ✅ Change cursor to pointer when hovering points
+      map.on('mouseenter', 'california_points', () => {
         map.getCanvas().style.cursor = 'pointer';
       });
-      map.on('mouseleave', 'california_locations-235efp', () => {
+      map.on('mouseleave', 'california_points', () => {
         map.getCanvas().style.cursor = '';
       });
     });
