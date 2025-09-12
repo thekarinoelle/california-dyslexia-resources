@@ -27,12 +27,10 @@
     // ✅ Your public access token
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
 
-    // ✅ Initialize map with a standard monochrome style
-    // Use 'mapbox://styles/mapbox/dark-v11' for a dark monochrome theme
-    // Use 'mapbox://styles/mapbox/light-v11' for a light monochrome theme
+    // ✅ Initialize map with your custom style URL
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/mapbox/dark-v11',
+      style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua', // Use your custom monochrome style
       center: [-119.4179, 36.7783], // California
       zoom: 5
     });
@@ -48,29 +46,12 @@
     map.addControl(new mapboxgl.NavigationControl());
 
     map.on('load', () => {
-      // Add your vector tileset as a source
-      map.addSource('california_locations', {
-        type: 'vector',
-        url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
-      });
-
-      // Add a circle layer for the points, referencing the new source
-      map.addLayer({
-        id: 'california-dyslexia-resource-locations',
-        type: 'circle',
-        source: 'california_locations',
-        'source-layer': 'california_locations-235efp', // The source layer name from your tileset
-        paint: {
-          'circle-radius': 6,
-          'circle-color': '#007cbf', // Customize this color as desired
-          'circle-stroke-width': 1,
-          'circle-stroke-color': '#fff'
-        }
-      });
+      // **Use the updated layer ID for events**
+      const studioLayerId = 'california-dyslexia-resource-locations';
 
       // ✅ Add popups when clicking points
-      const layerId = 'california-dyslexia-resource-locations';
-      map.on('click', layerId, (e) => {
+      map.on('click', studioLayerId, (e) => {
+        // Corrected feature property access
         const props = e.features[0].properties;
 
         // Bolding field titles in the popup
@@ -89,10 +70,10 @@
       });
 
       // ✅ Change cursor to pointer when hovering points
-      map.on('mouseenter', layerId, () => {
+      map.on('mouseenter', studioLayerId, () => {
         map.getCanvas().style.cursor = 'pointer';
       });
-      map.on('mouseleave', layerId, () => {
+      map.on('mouseleave', studioLayerId, () => {
         map.getCanvas().style.cursor = '';
       });
     });
