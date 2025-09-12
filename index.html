@@ -17,6 +17,27 @@
     body { margin: 0; padding: 0; }
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
     .mapboxgl-popup { max-width: 300px; font: 14px/20px 'Helvetica Neue', Arial, sans-serif; }
+
+    /* ✅ Add custom styling for the popup content */
+    /* Make popup content scrollable and add padding */
+    .mapboxgl-popup-content {
+      padding: 15px; /* Add internal padding */
+      max-height: 250px; /* Set max height to enable scrolling */
+      overflow-y: auto; /* Add vertical scrollbar */
+    }
+    
+    /* Add a subtle line between fields */
+    .popup-field {
+      margin-bottom: 8px; /* Space between fields */
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee; /* Light gray line */
+    }
+
+    /* Remove the border for the last field */
+    .popup-field:last-of-type {
+      border-bottom: none;
+    }
+    
   </style>
 </head>
 <body>
@@ -52,7 +73,7 @@
         url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
       });
 
-      // **RE-ADDED: Add a circle layer for the points**
+      // ✅ Use a data-driven expression to color points by region
       map.addLayer({
         id: 'california_points',
         type: 'circle',
@@ -60,7 +81,14 @@
         'source-layer': 'california_locations-235efp', // Source layer name
         paint: {
           'circle-radius': 6,
-          'circle-color': '#007cbf',
+          'circle-color': [
+            'match',
+            ['get', 'Region'], // Get the 'Region' property from your data
+            'North', '#FF0000', // Red for North
+            'Central', '#FFFF00', // Yellow for Central
+            'South', '#0000FF', // Blue for South
+            '#007cbf' // Default color if no match
+          ],
           'circle-stroke-width': 1,
           'circle-stroke-color': '#fff'
         }
@@ -71,31 +99,28 @@
         const props = e.features[0].properties;
         let popupContent = '';
 
-        // Start with the required fields
-        popupContent += `<strong>${props["Location Name"] || "No Name"}</strong><br>`;
-        popupContent += `County: ${props.County || "N/A"}<br>`;
-        popupContent += `Region: ${props.Region || "N/A"}<br>`;
+        // Add optional fields only if they exist, and format them
+        function addField(label, value) {
+          if (value) {
+            popupContent += `<div class="popup-field"><strong>${label}:</strong> ${value}</div>`;
+          }
+        }
 
-        // Add optional fields only if they exist
-        if (props["Resource Type"]) {
-          popupContent += `Resource Type: ${props["Resource Type"]}<br>`;
-        }
-        if (props["Services Offered"]) {
-          popupContent += `Services: ${props["Services Offered"]}<br>`;
-        }
-        if (props.Address) {
-          popupContent += `Address: ${props.Address}<br>`;
-        }
-        if (props["Contact Info"]) {
-          popupContent += `Contact Info: ${props["Contact Info"]}<br>`;
-        }
-        if (props.Notes) {
-          popupContent += `Notes: ${props.Notes}<br>`;
-        }
+        // Add fields using the new helper function
+        addField("Location Name", props["Location Name"]);
+        addField("County", props.County);
+        addField("Region", props.Region);
+        addField("Resource Type", props["Resource Type"]);
+        addField("Services Offered", props["Services Offered"]);
+        addField("Address", props.Address);
+        addField("Contact Info", props["Contact Info"]);
+        addField("Notes", props.Notes);
+
+        // Handle the website link separately
         if (props.Website) {
-          popupContent += `<a href="${props.Website}" target="_blank">Website</a><br>`;
+          popupContent += `<div class="popup-field"><a href="${props.Website}" target="_blank">Website</a></div>`;
         }
-
+        
         new mapboxgl.Popup()
           .setLngLat(e.lngLat)
           .setHTML(popupContent)
@@ -103,7 +128,6 @@
       });
       
       // ✅ Change cursor to pointer when hovering points
-      // The layer ID was corrected to 'california_points'
       map.on('mouseenter', 'california_points', () => {
         map.getCanvas().style.cursor = 'pointer';
       });
