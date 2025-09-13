@@ -65,23 +65,23 @@ const map = new mapboxgl.Map({
     // ✅ Add navigation controls (zoom in/out + compass)
     map.addControl(new mapboxgl.NavigationControl());
 
-    map.on('load', () => {
-      // Add your vector tileset as a source
-      map.addSource('california_locations', {
+map.on('load', () => {
+    // Add your vector tileset as a source
+    map.addSource('california_locations', {
         type: 'vector',
         url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
-      });
+    });
 
-      // RENDER PINS WITH 0 OPACITY TO HIDE THEM
-      map.addLayer({
+    // RENDER PINS WITH 0 OPACITY TO HIDE THEM
+    map.addLayer({
         id: 'california_points',
         type: 'circle',
         source: 'california_locations',
         'source-layer': 'california_locations-235efp', // Source layer name
         paint: {
-          'circle-opacity': 0 // Make the circles completely transparent
+            'circle-opacity': 0 // Make the circles completely transparent
         }
-      });
+    });
       
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
