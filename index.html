@@ -37,11 +37,6 @@
       border-bottom: none;
       padding-bottom: 0;
     }
-    
-    /* CSS TO HIDE THE ATTRIBUTION LINKS */
-    .mapboxgl-ctrl-bottom-right > span {
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -58,9 +53,7 @@
       style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
       center: [-119.4179, 36.7783],
       zoom: 5,
-      cooperativeGestures: true, // Enable cooperative gestures
-      attributionControl: true, // Re-enable the built-in control
-      customAttribution: '© Mapbox, © OpenStreetMap' // Set custom text here
+      cooperativeGestures: true // Enable cooperative gestures
     });
 
     // ✅ Add search control (geocoder)
@@ -137,7 +130,7 @@
         addField("Notes", props.Notes);
         addLink("Website", props.Website, "url");
 
-        const popup = new mapboxgl.Popup({ focusAfterOpen: false })
+        const popup = new mapboxgl.Popup({ focusAfterOpen: false }) // Add this line
           .setLngLat(e.lngLat)
           .setHTML(popupContent)
           .addTo(map);
