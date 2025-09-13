@@ -135,10 +135,13 @@
           .addTo(map);
           
         popup.on('open', () => {
-          const popupContentElement = popup.getElement().querySelector('.mapboxgl-popup-content');
-          if (popupContentElement) {
-            popupContentElement.scrollTop = 0;
-          }
+          // Delay the scroll to ensure the popup content is fully rendered
+          setTimeout(() => {
+            const popupContentElement = popup.getElement().querySelector('.mapboxgl-popup-content');
+            if (popupContentElement) {
+              popupContentElement.scrollTop = 0;
+            }
+          }, 0);
         });
       });
       
