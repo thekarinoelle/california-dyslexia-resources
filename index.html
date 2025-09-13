@@ -136,13 +136,6 @@
           popup.getElement().querySelector('.mapboxgl-popup-content').scrollTop = 0;
         });
       });
-          
-        // ✅ Make sure the scrollbar starts at the top
-        // Must wait for DOM to render the content before getting scroll position
-        popup.on('open', () => {
-          popup.getElement().querySelector('.mapboxgl-popup-content').scrollTop = 0;
-        });
-      });
       
       // ✅ Change cursor to pointer when hovering points
       map.on('mouseenter', 'california_points', () => {
