@@ -73,6 +73,7 @@
       });
 
       // RENDER PINS WITH STYLE FROM MAPBOX STUDIO
+      // Ensure the 'paint' properties are defined in your Mapbox Studio style.
       map.addLayer({
         id: 'california_points',
         type: 'circle',
@@ -82,7 +83,7 @@
       
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
-        const props = e.features[0].properties; // Use e.features[0].properties instead of e.features.properties
+        const props = e.features[0].properties; // Use e.features[0].properties
         let popupContent = '';
 
         function addField(label, value) {
