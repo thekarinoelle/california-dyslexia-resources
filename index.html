@@ -79,27 +79,19 @@
         type: 'circle',
         source: 'california_locations',
         'source-layer': 'california_locations-235efp', // Source layer name
-        paint: {
-          'circle-radius': 6,
-          'circle-stroke-width': 1,
-          'circle-stroke-color': '#fff'
-        }
       });
       
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
-        // FIXED: Access properties correctly using e.features[0].properties
         const props = e.features[0].properties;
         let popupContent = '';
 
-        // Helper function to add a field with proper formatting
         function addField(label, value) {
           if (value) {
             popupContent += `<div class="popup-field"><strong>${label}:</strong> ${value}</div>`;
           }
         }
 
-        // Helper function to add a field with a hyperlink
         function addLink(label, value, type) {
           if (!value) return;
 
@@ -109,12 +101,12 @@
           } else if (type === 'address') {
             href = `https://maps.google.com/maps?q=${encodeURIComponent(value)}`;
           } else {
-            href = value.startsWith('http') ? value : `https://${value}`; // Prepend https:// if missing
+            href = value.startsWith('http') ? value : `https://${value}`;
           }
-          
+
           popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
         }
-
+        
         // Add fields to the popup content
         addField("Location Name", props["Location Name"]);
         addField("County", props.County);
@@ -122,7 +114,16 @@
         addField("Resource Type", props["Resource Type"]);
         addField("Services Offered", props["Services Offered"]);
         addLink("Address", props.Address, "address");
-        addLink("Contact Info", props["Contact Info"], "email");
+        
+        // --- CORRECTED LOGIC FOR CONTACT INFO ---
+        const contactInfo = props["Contact Info"];
+        if (contactInfo && contactInfo.includes('@')) {
+          addLink("Contact Info", contactInfo, "email");
+        } else {
+          addField("Contact Info", contactInfo);
+        }
+        // ----------------------------------------
+        
         addField("Notes", props.Notes);
         addLink("Website", props.Website, "url");
 
@@ -130,6 +131,11 @@
           .setLngLat(e.lngLat)
           .setHTML(popupContent)
           .addTo(map);
+          
+        popup.on('open', () => {
+          popup.getElement().querySelector('.mapboxgl-popup-content').scrollTop = 0;
+        });
+      });
           
         // ✅ Make sure the scrollbar starts at the top
         // Must wait for DOM to render the content before getting scroll position
