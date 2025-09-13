@@ -44,16 +44,16 @@
 
   <!-- Custom Map Script -->
   <script>
-    // ✅ Your public access token
-    mapboxgl.accessToken = 'pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
+// ✅ Your public access token
+mapboxgl.accessToken = 'pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
 
-    // ✅ Initialize map with your custom style URL
-    const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
-      center: [-119.4179, 36.7783],
-      zoom: 5
-    });
+// ✅ Initialize map with a standard monochrome style
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/light-v11', // Replaced with a standard monochrome style
+  center: [-119.4179, 36.7783],
+  zoom: 5
+});
 
     // ✅ Add search control (geocoder)
     const geocoder = new MapboxGeocoder({
