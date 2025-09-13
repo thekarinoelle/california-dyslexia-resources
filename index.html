@@ -38,13 +38,9 @@
       padding-bottom: 0;
     }
     
-    /* *** CSS TO HIDE THE ATTRIBUTION LINKS *** */
+    /* CSS TO HIDE THE ATTRIBUTION LINKS */
     .mapboxgl-ctrl-bottom-right > span {
       display: none;
-    }
-    .mapboxgl-ctrl-attrib-inner a,
-    .mapbox-improve-map {
-      display: none !important;
     }
   </style>
 </head>
@@ -63,11 +59,9 @@
       center: [-119.4179, 36.7783],
       zoom: 5,
       cooperativeGestures: true, // Enable cooperative gestures
-      attributionControl: false // Disable the default attribution control
+      attributionControl: true, // Re-enable the built-in control
+      customAttribution: '© Mapbox, © OpenStreetMap' // Set custom text here
     });
-    
-    // The previous custom attribution control is no longer needed
-    // as the CSS will hide everything in the attribution container.
 
     // ✅ Add search control (geocoder)
     const geocoder = new MapboxGeocoder({
@@ -99,7 +93,7 @@
       
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
-        const props = e.features.properties;
+        const props = e.features[0].properties;
         let popupContent = '';
 
         function addField(label, value) {
@@ -143,7 +137,7 @@
         addField("Notes", props.Notes);
         addLink("Website", props.Website, "url");
 
-        const popup = new mapboxgl.Popup({ focusAfterOpen: false }) // Add this line
+        const popup = new mapboxgl.Popup({ focusAfterOpen: false })
           .setLngLat(e.lngLat)
           .setHTML(popupContent)
           .addTo(map);
