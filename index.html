@@ -18,18 +18,18 @@
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
     .mapboxgl-popup { max-width: 300px; font: 14px/20px 'Helvetica Neue', Arial, sans-serif; }
 
-    /* Custom styling for the popup content */
+    /* ✅ Add custom styling for the popup content */
     .mapboxgl-popup-content {
-      padding: 15px;
-      max-height: 250px;
-      overflow-y: auto;
+      padding: 15px; /* Add internal padding */
+      max-height: 250px; /* Set max height to enable scrolling */
+      overflow-y: auto; /* Add vertical scrollbar */
     }
     
     /* Add a subtle line between fields */
     .popup-field {
-      margin-bottom: 8px;
+      margin-bottom: 8px; /* Space between fields */
       padding-bottom: 8px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #eee; /* Light gray line */
     }
 
     /* Remove the border for the last field */
@@ -50,8 +50,8 @@
     // ✅ Initialize map with your custom style URL
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
-      center: [-119.4179, 36.7783],
+      style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua', // Use your custom monochrome style
+      center: [-119.4179, 36.7783], // California
       zoom: 5
     });
 
@@ -72,8 +72,7 @@
         url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
       });
 
-      // RENDER PINS WITH STYLE FROM MAPBOX STUDIO
-      // Removing the `circle-color` override will make it use the color defined in your Studio style.
+      // ✅ RENDER PINS WITH STYLE FROM MAPBOX STUDIO (Removed the `circle-color` override)
       map.addLayer({
         id: 'california_points',
         type: 'circle',
@@ -88,8 +87,7 @@
       
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
-        // FIXED: Access properties correctly using e.features[0].properties
-        const props = e.features[0].properties;
+        const props = e.features.properties;
         let popupContent = '';
 
         // Helper function to add a field with proper formatting
@@ -109,7 +107,7 @@
           } else if (type === 'address') {
             href = `https://maps.google.com/maps?q=${encodeURIComponent(value)}`;
           } else {
-            href = value.startsWith('http') ? value : `https://${value}`; // Prepend https:// if missing
+            href = value; // Default to a standard URL
           }
           
           popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
@@ -132,10 +130,7 @@
           .addTo(map);
           
         // ✅ Make sure the scrollbar starts at the top
-        // Must wait for DOM to render the content before getting scroll position
-        popup.on('open', () => {
-          popup.getElement().querySelector('.mapboxgl-popup-content').scrollTop = 0;
-        });
+        popup.getElement().querySelector('.mapboxgl-popup-content').scrollTop = 0;
       });
       
       // ✅ Change cursor to pointer when hovering points
