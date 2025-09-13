@@ -53,8 +53,14 @@
       style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
       center: [-119.4179, 36.7783],
       zoom: 5,
-      cooperativeGestures: true // Enable cooperative gestures
+      cooperativeGestures: true, // Enable cooperative gestures
+      attributionControl: false // Disable the default attribution control
     });
+    
+    // ✅ Add custom, non-linked attribution text
+    map.addControl(new mapboxgl.AttributionControl({
+      customAttribution: '© Mapbox, © OpenStreetMap'
+    }));
 
     // ✅ Add search control (geocoder)
     const geocoder = new MapboxGeocoder({
