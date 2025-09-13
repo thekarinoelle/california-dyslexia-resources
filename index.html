@@ -82,7 +82,7 @@
       
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
-        const props = e.features[0].properties; // Corrected feature access
+        const props = e.features[0].properties;
         let popupContent = '';
 
         function addField(label, value) {
