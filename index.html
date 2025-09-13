@@ -37,6 +37,17 @@
       border-bottom: none;
       padding-bottom: 0;
     }
+    
+    /* *** CSS TO HIDE THE ATTRIBUTION LINKS *** */
+    .mapboxgl-ctrl-bottom-right > span {
+      display: none;
+    }
+    .mapbox-improve-map {
+      display: none !important;
+    }
+    .mapboxgl-ctrl-attrib-inner a {
+      pointer-events: none; /* Disables click on all attribution links */
+    }
   </style>
 </head>
 <body>
