@@ -38,10 +38,13 @@
       padding-bottom: 0;
     }
     
-    /* CSS TO HIDE THE ATTRIBUTION LINKS */
-    /* This rule hides the links that appear even after the main control is disabled */
+    /* *** CSS TO HIDE THE ATTRIBUTION LINKS *** */
     .mapboxgl-ctrl-bottom-right > span {
       display: none;
+    }
+    .mapboxgl-ctrl-attrib-inner a,
+    .mapbox-improve-map {
+      display: none !important;
     }
   </style>
 </head>
@@ -60,10 +63,12 @@
       center: [-119.4179, 36.7783],
       zoom: 5,
       cooperativeGestures: true, // Enable cooperative gestures
-      attributionControl: true, // Re-enable the built-in control
-      customAttribution: '© Mapbox, © OpenStreetMap' // Set custom text here
+      attributionControl: false // Disable the default attribution control
     });
     
+    // The previous custom attribution control is no longer needed
+    // as the CSS will hide everything in the attribution container.
+
     // ✅ Add search control (geocoder)
     const geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
@@ -94,7 +99,7 @@
       
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
-        const props = e.features[0].properties;
+        const props = e.features.properties;
         let popupContent = '';
 
         function addField(label, value) {
