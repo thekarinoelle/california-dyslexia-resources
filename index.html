@@ -82,7 +82,7 @@
       
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
-        const props = e.features[0].properties;
+        const props = e.features[0].properties; // Use e.features[0].properties instead of e.features.properties
         let popupContent = '';
 
         function addField(label, value) {
@@ -132,7 +132,10 @@
           .addTo(map);
           
         popup.on('open', () => {
-          popup.getElement().querySelector('.mapboxgl-popup-content').scrollTop = 0;
+          const popupContentElement = popup.getElement().querySelector('.mapboxgl-popup-content');
+          if (popupContentElement) {
+            popupContentElement.scrollTop = 0;
+          }
         });
       });
       
