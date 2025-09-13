@@ -47,12 +47,13 @@
     // ✅ Your public access token
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FyaW5vZWxsZWRlc2lnbiIsImEiOiJjbWZjdDg5MjQwMDk3MmpwejJmZWo3dGs5In0.ZXdP8WIoIH4pN-BU01gtGQ';
 
-    // ✅ Initialize map with your custom style URL
+    // ✅ Initialize map with your custom style URL and cooperative gestures
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/karinoelledesign/cmfbhvtvn004901so4yee4iua',
       center: [-119.4179, 36.7783],
-      zoom: 5
+      zoom: 5,
+      cooperativeGestures: true // Enable cooperative gestures
     });
 
     // ✅ Add search control (geocoder)
