@@ -73,7 +73,6 @@
       });
 
       // RENDER PINS WITH STYLE FROM MAPBOX STUDIO
-      // Removing the `circle-color` override will make it use the color defined in your Studio style.
       map.addLayer({
         id: 'california_points',
         type: 'circle',
@@ -83,7 +82,7 @@
       
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
-        const props = e.features[0].properties;
+        const props = e.features[0].properties; // Corrected feature access
         let popupContent = '';
 
         function addField(label, value) {
