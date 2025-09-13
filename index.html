@@ -72,18 +72,20 @@
         url: 'mapbox://karinoelledesign.1kdo2o48' // Your tileset ID
       });
 
-      // RENDER PINS WITH STYLE FROM MAPBOX STUDIO
-      // Ensure the 'paint' properties are defined in your Mapbox Studio style.
+      // RENDER PINS WITH 0 OPACITY TO HIDE THEM
       map.addLayer({
         id: 'california_points',
         type: 'circle',
         source: 'california_locations',
         'source-layer': 'california_locations-235efp', // Source layer name
+        paint: {
+          'circle-opacity': 0 // Make the circles completely transparent
+        }
       });
       
       // ✅ Add popups when clicking points
       map.on('click', 'california_points', (e) => {
-        const props = e.features[0].properties; // Use e.features[0].properties
+        const props = e.features[0].properties; // **FIXED**: Correctly access the properties
         let popupContent = '';
 
         function addField(label, value) {
