@@ -38,15 +38,10 @@
       padding-bottom: 0;
     }
     
-    /* *** CSS TO HIDE THE ATTRIBUTION LINKS *** */
+    /* CSS TO HIDE THE ATTRIBUTION LINKS */
+    /* This rule hides the links that appear even after the main control is disabled */
     .mapboxgl-ctrl-bottom-right > span {
       display: none;
-    }
-    .mapbox-improve-map {
-      display: none !important;
-    }
-    .mapboxgl-ctrl-attrib-inner a {
-      pointer-events: none; /* Disables click on all attribution links */
     }
   </style>
 </head>
@@ -65,14 +60,10 @@
       center: [-119.4179, 36.7783],
       zoom: 5,
       cooperativeGestures: true, // Enable cooperative gestures
-      attributionControl: false // Disable the default attribution control
+      attributionControl: true, // Re-enable the built-in control
+      customAttribution: '© Mapbox, © OpenStreetMap' // Set custom text here
     });
     
-    // ✅ Add custom, non-linked attribution text
-    map.addControl(new mapboxgl.AttributionControl({
-      customAttribution: '© Mapbox, © OpenStreetMap'
-    }));
-
     // ✅ Add search control (geocoder)
     const geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
