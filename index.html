@@ -89,13 +89,13 @@
         const props = e.features[0].properties;
         let popupContent = '';
 
-        function addField(value) {
+        function addField(label, value) {
           if (value) {
-            popupContent += `<div class="popup-field"><strong>${value}</strong></div>`;
+            popupContent += `<div class="popup-field"><strong>${label}:</strong> ${value}</div>`;
           }
         }
 
-        function addLink(value, type) {
+        function addLink(label, value, type) {
           if (!value) return;
 
           let href;
@@ -107,21 +107,26 @@
             href = value.startsWith('http') ? value : `https://${value}`;
           }
 
-          popupContent += `<div class="popup-field"><strong><a href="${href}" target="_blank">${value}</a></strong></div>`;
+          popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
         }
         
-        // Add fields to the popup content in the new specified order
-        addField(props["Location Name"]);
-        addLink(props.Website, "url");
-        addField(props.Region);
-        addField(props.County);
-        addLink(props.Address, "address");
-        addField(props.Phone);
-        addLink(props.Email, "email");
-        addField(props["Contact Info"]);
-        addField(props["Resource Type"]);
-        addField(props["Services Offered"]);
-        addField(props.Notes);
+        // Add fields to the popup content in the specified order
+        // Special handling for Location Name (bold, no title)
+        if (props["Location Name"]) {
+            popupContent += `<div class="popup-field"><strong>${props["Location Name"]}</strong></div>`;
+        }
+        
+        // Add remaining fields in the desired order with their titles
+        addLink("Website", props.Website, "url");
+        addField("Region", props.Region);
+        addField("County", props.County);
+        addLink("Address", props.Address, "address");
+        addField("Phone", props.Phone);
+        addLink("Email", props.Email, "email");
+        addField("Contact Info", props["Contact Info"]);
+        addField("Resource Type", props["Resource Type"]);
+        addField("Services Offered", props["Services Offered"]);
+        addField("Notes", props.Notes);
 
         const popup = new mapboxgl.Popup({ focusAfterOpen: false })
           .setLngLat(e.lngLat)
