@@ -75,7 +75,7 @@
 
       // RENDER PINS WITH 0 OPACITY TO HIDE THEM
       map.addLayer({
-        id: 'california_points',
+        id: 'california-dyslexia-resources', // **UPDATED** Data Layer name
         type: 'circle',
         source: 'california_locations',
         'source-layer': 'california_locations-235efp', // Source layer name
@@ -85,7 +85,7 @@
       });
       
       // ✅ Add popups when clicking points
-      map.on('click', 'california_points', (e) => {
+      map.on('click', 'california-dyslexia-resources', (e) => { // **UPDATED** to new layer name
         const props = e.features[0].properties;
         let popupContent = '';
 
@@ -130,7 +130,7 @@
         addField("Notes", props.Notes);
         addLink("Website", props.Website, "url");
 
-        const popup = new mapboxgl.Popup({ focusAfterOpen: false }) // Add this line
+        const popup = new mapboxgl.Popup({ focusAfterOpen: false })
           .setLngLat(e.lngLat)
           .setHTML(popupContent)
           .addTo(map);
@@ -144,10 +144,10 @@
       });
       
       // ✅ Change cursor to pointer when hovering points
-      map.on('mouseenter', 'california_points', () => {
+      map.on('mouseenter', 'california-dyslexia-resources', () => { // **UPDATED** to new layer name
         map.getCanvas().style.cursor = 'pointer';
       });
-      map.on('mouseleave', 'california_points', () => {
+      map.on('mouseleave', 'california-dyslexia-resources', () => { // **UPDATED** to new layer name
         map.getCanvas().style.cursor = '';
       });
     });
