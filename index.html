@@ -111,17 +111,17 @@
         }
         
         // Add fields to the popup content in the specified order
-        addLink("Address", props.Address, "address");
-        addField("Contact Info", props["Contact Info"]);
-        addField("County", props.County);
-        addLink("Email", props.Email, "email");
         addField("Location Name", props["Location Name"]);
-        addField("Notes", props.Notes);
-        addField("Phone", props.Phone);
         addField("Region", props.Region);
+        addField("County", props.County);
+        addLink("Address", props.Address, "address");
+        addLink("Website", props.Website, "url");
+        addField("Phone", props.Phone);
+        addLink("Email", props.Email, "email");
+        addField("Contact Info", props["Contact Info"]);
         addField("Resource Type", props["Resource Type"]);
         addField("Services Offered", props["Services Offered"]);
-        addLink("Website", props.Website, "url");
+        addField("Notes", props.Notes);
 
         const popup = new mapboxgl.Popup({ focusAfterOpen: false })
           .setLngLat(e.lngLat)
