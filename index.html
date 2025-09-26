@@ -110,24 +110,17 @@
           popupContent += `<div class="popup-field"><strong>${label}:</strong> <a href="${href}" target="_blank">${value}</a></div>`;
         }
         
-        // Add fields to the popup content
-        addField("Location Name", props["Location Name"]);
+        // Add fields to the popup content in the specified order
+        addLink("Address", props.Address, "address");
+        addField("Contact Info", props["Contact Info"]);
         addField("County", props.County);
+        addLink("Email", props.Email, "email");
+        addField("Location Name", props["Location Name"]);
+        addField("Notes", props.Notes);
+        addField("Phone", props.Phone);
         addField("Region", props.Region);
         addField("Resource Type", props["Resource Type"]);
         addField("Services Offered", props["Services Offered"]);
-        addLink("Address", props.Address, "address");
-        
-        // --- CORRECTED LOGIC FOR CONTACT INFO ---
-        const contactInfo = props["Contact Info"];
-        if (contactInfo && contactInfo.includes('@')) {
-          addLink("Contact Info", contactInfo, "email");
-        } else {
-          addField("Contact Info", contactInfo);
-        }
-        // ----------------------------------------
-        
-        addField("Notes", props.Notes);
         addLink("Website", props.Website, "url");
 
         const popup = new mapboxgl.Popup({ focusAfterOpen: false })
